@@ -30,10 +30,12 @@
 #include <GL/glx.h>
 #include <pthread.h>
 
+#include <dlfcn.h>
 
 #include "NvFBC.h"
 #include "NvFBCUtils.h"
 #include "nvEncodeAPI.h"
+#include <sys/types.h>
 
 G_BEGIN_DECLS
 
@@ -41,6 +43,10 @@ typedef struct _GstXContext GstXContext;
 typedef struct _GstNVimage GstNVimage;
 typedef struct _GstMetaNVimage GstMetaNVimage;
 
+
+/* Nvidia function pointers */
+
+// Define function pointer type for nvFBCToGLGrabFrame
 typedef struct {
         int function;
         union {
@@ -126,6 +132,7 @@ struct _GstXContext {
   pthread_cond_t cond_in;
   pthread_cond_t cond_out;
   GstXThreadCall funcdata;
+  PNVFBCTOGLGRABFRAME pFnNvFBCToGLGrabFrame;
 
   FILE *out;
 };

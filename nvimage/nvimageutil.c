@@ -32,6 +32,21 @@ static gboolean nvimageutil_xcontext_get (GstXContext *xcontext, GstElement * pa
 static void nvimageutil_xcontext_clear (GstXContext * xcontext);
 static GstBuffer * gst_nvimageutil_nvimage_new (GstXContext * xcontext, GstElement * parent, guint fps_n, guint fps_d, gint bitrate, gboolean show_pointer, gint forcekeyframe, gint64 frame, gint64 ts);
 
+
+void loadNvidiaLibraries(GstXContext *xcontext) {
+    void* libNvFBC = dlopen("libNvFBC.so", RTLD_LAZY);
+    if (!libNvFBC) {
+        fprintf(stderr, "Failed to load 'libNvFBC.so'\n");
+        return;
+    }
+
+    xcontext->pFnNvFBCToGLGrabFrame = (PNVFBCTOGLGRABFRAME)dlsym(libNvFBC, "NvFBCToGLGrabFrame");
+    if (!xcontext->pFnNvFBCToGLGrabFrame) {
+        fprintf(stderr, "Failed to load symbol 'NvFBCToGLGrabFrame': %s\n", dlerror());
+        dlclose(libNvFBC);
+    }
+}
+
 GType
 gst_meta_nvimage_api_get_type (void)
 {
