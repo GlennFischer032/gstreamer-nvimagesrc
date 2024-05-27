@@ -43,10 +43,18 @@ typedef struct _GstXContext GstXContext;
 typedef struct _GstNVimage GstNVimage;
 typedef struct _GstMetaNVimage GstMetaNVimage;
 
+// Declare function pointers
+typedef NVENCSTATUS (NVENCAPI *PFNNVENCODEAPICREATEINSTANCEPROC)(NV_ENCODE_API_FUNCTION_LIST *);
 
-/* Nvidia function pointers */
 
-// Define function pointer type for nvFBCToGLGrabFrame
+// Declare extern variables
+extern void *libNVFBC;
+extern PNVFBCCREATEINSTANCE NvFBCCreateInstance_ptr;
+
+extern void *libEnc;
+extern PFNNVENCODEAPICREATEINSTANCEPROC NvEncodeAPICreateInstance_ptr;
+
+
 typedef struct {
         int function;
         union {
@@ -132,7 +140,6 @@ struct _GstXContext {
   pthread_cond_t cond_in;
   pthread_cond_t cond_out;
   GstXThreadCall funcdata;
-  PNVFBCTOGLGRABFRAME pFnNvFBCToGLGrabFrame;
 
   FILE *out;
 };
