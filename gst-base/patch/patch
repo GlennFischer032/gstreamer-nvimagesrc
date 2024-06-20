@@ -1,0 +1,12 @@
+diff -rNu gst-plugins-good.orig/sys/ximage/gstximagesrc.c gst-plugins-good/sys/ximage/gstximagesrc.c
+--- gst-plugins-good.orig/sys/ximage/gstximagesrc.c	2021-06-04 23:35:40.746286507 +0200
++++ gst-plugins-good/sys/ximage/gstximagesrc.c	2021-06-18 14:44:12.987501128 +0200
+@@ -706,7 +706,7 @@
+       GST_DEBUG_OBJECT (ximagesrc, "Retrieving screen using XShm");
+       XShmGetImage (ximagesrc->xcontext->disp, ximagesrc->xwindow,
+           meta->ximage, ximagesrc->startx, ximagesrc->starty, AllPlanes);
+-
++      GST_DEBUG_OBJECT (ximagesrc, "Retrieving screen using XShm done");
+     } else
+ #endif /* HAVE_XSHM */
+     {
