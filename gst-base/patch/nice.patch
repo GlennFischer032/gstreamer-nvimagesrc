@@ -1,0 +1,30 @@
+diff -rNu libnice.orig/socket/udp-bsd.c libnice/socket/udp-bsd.c
+--- libnice.orig/socket/udp-bsd.c	2021-06-04 22:49:12.960129415 +0200
++++ libnice/socket/udp-bsd.c	2021-08-26 21:43:05.285231603 +0200
+@@ -48,6 +48,7 @@
+ #include <string.h>
+ #include <errno.h>
+ #include <fcntl.h>
++#include <time.h>
+ 
+ #include "udp-bsd.h"
+ #include "agent-priv.h"
+@@ -255,6 +256,7 @@
+   GError *child_error = NULL;
+   gssize len;
+   GSocketAddress *gaddr = NULL;
++  struct timespec sl;
+ 
+   /* Make sure socket has not been freed: */
+   g_assert (sock->priv != NULL);
+@@ -319,7 +321,9 @@
+           remote_addr_str, nice_address_get_port (&remote_addr),
+           child_error->message);
+     }
+-
++    sl.tv_sec = 0;
++    sl.tv_nsec = 100000;
++    nanosleep(&sl, NULL);
+     g_error_free (child_error);
+   }
+ 

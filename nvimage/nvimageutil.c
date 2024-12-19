@@ -345,7 +345,7 @@ nvimageutil_fbccontext_get(GstXContext *xcontext)
 
         xcontext->pFn.dwVersion = NVFBC_VERSION;
 
-        fbcStatus = NvFBCCreateInstance(&xcontext->pFn);
+        fbcStatus = NvFBCCreateInstance_ptr(&xcontext->pFn);
         if (fbcStatus != NVFBC_SUCCESS) {
                 g_error ("Cannot create FBC instance %d", fbcStatus);
                 return FALSE;
@@ -408,7 +408,7 @@ nvimageutil_fbccontext_get(GstXContext *xcontext)
 
         xcontext->pEncFn.version = NV_ENCODE_API_FUNCTION_LIST_VER;
 
-        encStatus = NvEncodeAPICreateInstance(&xcontext->pEncFn);
+        encStatus = NvEncodeAPICreateInstance_ptr(&xcontext->pEncFn);
         if (encStatus != NV_ENC_SUCCESS) {
                 g_error ("Cannot create NVENC instance %d", encStatus);
                 return FALSE;

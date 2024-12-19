@@ -73,6 +73,11 @@ enum
         PROP_FPS,
 };
 
+void *libNVFBC = NULL;
+PNVFBCCREATEINSTANCE NvFBCCreateInstance_ptr = NULL;
+void *libEnc = NULL;
+PFNNVENCODEAPICREATEINSTANCEPROC NvEncodeAPICreateInstance_ptr = NULL;
+
 #define gst_nvimage_src_parent_class parent_class
 G_DEFINE_TYPE (GstNVimageSrc, gst_nvimage_src, GST_TYPE_PUSH_SRC);
 
@@ -307,6 +312,58 @@ gst_nvimage_src_get_property (GObject * object, guint prop_id, GValue * value, G
         }
 }
 
+// Function to load the library and resolve symbols
+gboolean load_NV_libs()
+{
+    // Load the library
+    libNVFBC = dlopen("libnvidia-fbc.so.1", RTLD_NOW);
+    if (!libNVFBC) {
+        g_printerr("Failed to load libNVFBC: %s\n", dlerror());
+        return FALSE;
+    }
+
+    libEnc = dlopen("libnvidia-encode.so.1", RTLD_NOW);
+    if (!libEnc) {
+        g_printerr("Failed to load libEnc: %s\n", dlerror());
+        unload_NV_libs();
+        return FALSE;
+    }
+
+
+    // Resolve symbols
+    NvFBCCreateInstance_ptr = (PNVFBCCREATEINSTANCE) dlsym(libNVFBC, "NvFBCCreateInstance");
+    if (!NvFBCCreateInstance_ptr) {
+        g_printerr("Failed to load symbol NvFBCCreateInstance: %s\n", dlerror());
+        unload_NV_libs();
+        return FALSE;
+    }
+
+    NvEncodeAPICreateInstance_ptr = 
+        (PFNNVENCODEAPICREATEINSTANCEPROC) dlsym(libEnc, "NvEncodeAPICreateInstance");
+    if (!NvEncodeAPICreateInstance_ptr) {
+        g_printerr("Failed to load symbol NvEncodeAPICreateInstance: %s\n", dlerror());
+        unload_NV_libs();
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+// Function to unload the library
+void unload_NV_libs()
+{
+    if (libNVFBC) {
+        dlclose(libNVFBC);
+        libNVFBC = NULL;
+        NvFBCCreateInstance_ptr = NULL;
+    }
+    if (libEnc) {
+        dlclose(libEnc);
+        libEnc = NULL;
+        NvEncodeAPICreateInstance_ptr = NULL;
+    }
+}
+
 static void
 gst_nvimage_src_dispose (GObject * object)
 {
@@ -320,6 +377,8 @@ gst_nvimage_src_finalize (GObject * object)
 
         if (src->xcontext)
                 nvimageutil_xcontext_clear_r (src->xcontext);
+        
+        unload_NV_libs();
 
         G_OBJECT_CLASS (parent_class)->finalize (object);
 }
@@ -475,6 +534,9 @@ gst_nvimage_src_init (GstNVimageSrc * nvimagesrc)
 static gboolean
 plugin_init (GstPlugin * plugin)
 {
+        if (!load_NV_libs()) {
+                return FALSE;
+        }
         gboolean ret;
 
         GST_DEBUG_CATEGORY_INIT (gst_debug_nvimage_src, "nvimagesrc", 0,

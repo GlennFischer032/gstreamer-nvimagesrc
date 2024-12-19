@@ -30,16 +30,30 @@
 #include <GL/glx.h>
 #include <pthread.h>
 
+#include <dlfcn.h>
 
 #include "NvFBC.h"
 #include "NvFBCUtils.h"
 #include "nvEncodeAPI.h"
+#include <sys/types.h>
 
 G_BEGIN_DECLS
 
 typedef struct _GstXContext GstXContext;
 typedef struct _GstNVimage GstNVimage;
 typedef struct _GstMetaNVimage GstMetaNVimage;
+
+// Declare function pointers
+typedef NVENCSTATUS (NVENCAPI *PFNNVENCODEAPICREATEINSTANCEPROC)(NV_ENCODE_API_FUNCTION_LIST *);
+
+
+// Declare extern variables
+extern void *libNVFBC;
+extern PNVFBCCREATEINSTANCE NvFBCCreateInstance_ptr;
+
+extern void *libEnc;
+extern PFNNVENCODEAPICREATEINSTANCEPROC NvEncodeAPICreateInstance_ptr;
+
 
 typedef struct {
         int function;

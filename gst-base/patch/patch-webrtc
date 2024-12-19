@@ -1,0 +1,12 @@
+diff -rNu gst-plugins-bad.orig/ext/webrtc/gstwebrtcbin.c gst-plugins-bad/ext/webrtc/gstwebrtcbin.c
+--- gst-plugins-bad.orig/ext/webrtc/gstwebrtcbin.c	2021-06-05 01:54:14.094268420 +0200
++++ gst-plugins-bad/ext/webrtc/gstwebrtcbin.c	2021-08-19 14:38:39.854967463 +0200
+@@ -6232,7 +6232,7 @@
+     gst_bin_add (GST_BIN (ret), fecenc);
+     sinkpad = gst_element_get_static_pad (fecenc, "sink");
+     g_object_set (fecenc, "pt", ulpfec_pt, "percentage",
+-        WEBRTC_TRANSCEIVER (trans)->fec_percentage, NULL);
++        25, NULL);
+ 
+ 
+     if (caps && !gst_caps_is_empty (caps)) {
